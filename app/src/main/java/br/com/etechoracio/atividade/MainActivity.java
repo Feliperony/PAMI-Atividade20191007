@@ -9,18 +9,21 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity implements CustomDialog.ItemListener, AdapterView.OnItemLongClickListener{
+public class MainActivity extends AppCompatActivity implements CustomDialog.ItemListener, AdapterView.OnItemLongClickListener, PopupMenu.OnMenuItemClickListener{
 
 
     @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
 
         PopupMenu popup = new PopupMenu(this, view);
         popup.inflate(R.menu.edite);
+        popup.setOnMenuItemClickListener(this);
         popup.show();
+        selectedItem = position;
         return true;
     }
 
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements CustomDialog.Item
     private String selectedItemName;
     private int selectedItem;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements CustomDialog.Item
 
         listView = findViewById(R.id.listView);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
-
+        listView.setOnItemLongClickListener(this);
     }
 
     @Override
@@ -76,4 +79,26 @@ public class MainActivity extends AppCompatActivity implements CustomDialog.Item
         }
     }
 
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+
+        switch (menuItem.getItemId()) {
+            case R.id.adExcluir:
+                adapter.removeItem(selectedItem);
+
+                return true;
+
+             case R.id.adEditar:
+                 CustomDialog editar = new CustomDialog(this);
+                 editar.show(getFragmentManager(),"editar");
+                 insertMode = false ;
+                 return  true;
+
+            default:
+                return super.onOptionsItemSelected(menuItem);
+
+        }
+
+    }
 }
